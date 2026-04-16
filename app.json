@@ -83,6 +83,10 @@
       ],
       [
         "expo-media-library",
+        {}
+      ],
+      [
+        "expo-media-library",
         {
           "permissions": [
             "READ_EXTERNAL_STORAGE",
