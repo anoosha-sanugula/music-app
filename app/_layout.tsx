@@ -35,7 +35,7 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="liked"
+          name="liked/index"
           options={{
             headerShown: false,
           }}
