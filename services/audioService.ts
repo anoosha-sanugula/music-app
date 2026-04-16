@@ -1,19 +1,12 @@
 import { Audio, type AVPlaybackStatus } from 'expo-av';
+import type { Song } from '@/types/Song';
 
 let sound: Audio.Sound | null = null;
-
-export async function configureAudio(): Promise<void> {
-  await Audio.setAudioModeAsync({
-    staysActiveInBackground: true,
-    playsInSilentModeIOS: true,
-    shouldDuckAndroid: true,
-  });
-}
 
 export async function loadAndPlaySong(
   uri: string,
   onStatusUpdate: (status: AVPlaybackStatus) => void
-): Promise<Audio.Sound> {
+): Promise<Audio.Sound | null> {
   if (sound) {
     await sound.unloadAsync();
     sound = null;
@@ -21,10 +14,10 @@ export async function loadAndPlaySong(
 
   const { sound: newSound } = await Audio.Sound.createAsync(
     { uri },
-    { shouldPlay: true },
-    onStatusUpdate
+    { shouldPlay: true }
   );
 
+  newSound.setOnPlaybackStatusUpdate(onStatusUpdate);
   sound = newSound;
   return sound;
 }
@@ -52,4 +45,8 @@ export async function unload(): Promise<void> {
     await sound.unloadAsync();
     sound = null;
   }
+}
+
+export function getSound(): Audio.Sound | null {
+  return sound;
 }

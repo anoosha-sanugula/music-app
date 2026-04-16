@@ -24,10 +24,7 @@ import {
   createPermissionListener,
 } from '@/services/permissionService';
 import { fetchSongs } from '@/services/musicService';
-import {
-  configureAudio,
-  loadAndPlaySong,
-} from '@/services/audioService';
+import { loadAndPlaySong } from '@/services/audioService';
 
 type SortOption = 'az' | 'za' | 'artist' | 'duration';
 
@@ -53,6 +50,7 @@ export default function SongsScreen() {
     setPosition,
     setDuration,
     setQueue,
+    initializeAudio,
   } = usePlayerStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,8 +59,8 @@ export default function SongsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    configureAudio();
-  }, []);
+    initializeAudio();
+  }, [initializeAudio]);
 
   const loadSongs = useCallback(async () => {
     setLoadingSongs(true);

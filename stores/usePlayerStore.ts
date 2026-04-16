@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Audio } from 'expo-av';
 import type { Song } from '@/types/Song';
 import type { PermissionStatus } from '@/services/permissionService';
 
@@ -14,6 +15,7 @@ interface PlayerState {
   queueIndex: number;
   repeatMode: 'off' | 'all' | 'one';
   isShuffled: boolean;
+  isAudioConfigured: boolean;
   setPermissionStatus: (status: PermissionStatus) => void;
   setSongs: (songs: Song[]) => void;
   setLoadingSongs: (loading: boolean) => void;
@@ -27,6 +29,7 @@ interface PlayerState {
   toggleShuffle: () => void;
   playNext: () => void;
   playPrevious: () => void;
+  initializeAudio: () => Promise<void>;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -41,6 +44,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   queueIndex: 0,
   repeatMode: 'off',
   isShuffled: false,
+  isAudioConfigured: false,
   setPermissionStatus: (status) => set({ permissionStatus: status }),
   setSongs: (songs) => set({ songs }),
   setLoadingSongs: (loading) => set({ isLoadingSongs: loading }),
@@ -77,5 +81,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     if (queueIndex > 0) {
       set({ queueIndex: queueIndex - 1 });
     }
+  },
+  initializeAudio: async () => {
+    if (get().isAudioConfigured) return;
+    
+    await Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+    });
+    set({ isAudioConfigured: true });
   },
 }));
