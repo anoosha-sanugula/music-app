@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useRouter, usePathname } from 'expo-router';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/utils/colors';
 import { usePlayerStore } from '@/stores';
 import { play, pause } from '@/services/audioService';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export function MiniPlayer() {
   const router = useRouter();
@@ -31,33 +31,28 @@ export function MiniPlayer() {
   }
 
   return (
-    <SafeAreaView edges={['bottom']} style={styles.safeArea}>
-      <Pressable
-        style={styles.container}
-        onPress={() => router.push('/modal')}
-      >
-        <View style={styles.info}>
-          <ThemedText style={styles.title} numberOfLines={1}>
-            {currentSong.title}
-          </ThemedText>
-          <ThemedText style={styles.artist} numberOfLines={1}>
-            {currentSong.artist}
-          </ThemedText>
-        </View>
-        <Pressable style={styles.playButton} onPress={handleTogglePlay}>
-          <ThemedText style={styles.playIcon}>
-            {isPlaying ? '⏸' : '▶'}
-          </ThemedText>
-        </Pressable>
+    <Pressable
+      style={styles.container}
+      onPress={() => router.push('/modal')}
+    >
+      <View style={styles.info}>
+        <ThemedText style={styles.title} numberOfLines={1}>
+          {currentSong.title}
+        </ThemedText>
+        <ThemedText style={styles.artist} numberOfLines={1}>
+          {currentSong.artist}
+        </ThemedText>
+      </View>
+      <Pressable style={styles.playButton} onPress={handleTogglePlay}>
+        <ThemedText style={styles.playIcon}>
+          {isPlaying ? '⏸' : '▶'}
+        </ThemedText>
       </Pressable>
-    </SafeAreaView>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: Colors.surface,
-  },
   container: {
     height: 56,
     backgroundColor: Colors.surface,
