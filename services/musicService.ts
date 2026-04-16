@@ -17,8 +17,6 @@ export async function fetchSongs(): Promise<Song[]> {
       after,
     });
 
-    console.log(`Page ${pageCount}: ${result.assets.length} assets returned`);
-
     hasNextPage = result.hasNextPage ?? false;
     after = result.endCursor ?? undefined;
 
@@ -31,13 +29,12 @@ export async function fetchSongs(): Promise<Song[]> {
             songs.push(normalizeSong(asset, assetInfo));
           }
         }
-      } catch (err) {
-        console.warn(`Failed to get asset info for ${asset.id}:`, err);
+      } catch {
+        // Skip assets that fail to load
       }
     }
 
     if (pageCount > 100) {
-      console.warn('fetchSongs: Stopping after 100 pages');
       break;
     }
 
@@ -46,7 +43,6 @@ export async function fetchSongs(): Promise<Song[]> {
     }
   }
 
-  console.log(`fetchSongs: Found ${songs.length} songs in ${pageCount} pages`);
   return songs;
 }
 
