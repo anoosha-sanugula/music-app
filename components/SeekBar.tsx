@@ -1,13 +1,14 @@
-import { View, StyleSheet } from 'react-native';
+import { useCallback, useState } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/utils/colors';
+import { usePlayerStore } from '@/stores';
+import { seekTo } from '@/services/audioService';
 
-interface Props {
-  position: number;
-  duration: number;
-}
+export function SeekBar() {
+  const { position, duration } = usePlayerStore();
+  const [barWidth, setBarWidth] = useState(200);
 
-export function SeekBar({ position, duration }: Props) {
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -17,11 +18,25 @@ export function SeekBar({ position, duration }: Props) {
 
   const progress = duration > 0 ? position / duration : 0;
 
+  const handleLayout = useCallback((event: { nativeEvent: { layout: { width: number } } }) => {
+    setBarWidth(event.nativeEvent.layout.width);
+  }, []);
+
+  const handlePress = useCallback(
+    (event: { nativeEvent: { locationX: number } }) => {
+      const seekPosition = (event.nativeEvent.locationX / barWidth) * duration;
+      if (seekPosition >= 0 && seekPosition <= duration) {
+        seekTo(seekPosition);
+      }
+    },
+    [barWidth, duration]
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.progressBar}>
+      <Pressable style={styles.progressBar} onPress={handlePress} onLayout={handleLayout}>
         <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-      </View>
+      </Pressable>
       <View style={styles.timeContainer}>
         <ThemedText style={styles.time}>{formatTime(position)}</ThemedText>
         <ThemedText style={styles.time}>{formatTime(duration)}</ThemedText>

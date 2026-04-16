@@ -13,8 +13,6 @@ export default function NowPlayingScreen() {
   const {
     currentSong,
     isPlaying,
-    position,
-    duration,
     queue,
     queueIndex,
     setIsPlaying,
@@ -49,7 +47,7 @@ export default function NowPlayingScreen() {
         </ThemedText>
       </View>
 
-      <SeekBar position={position} duration={duration} />
+      <SeekBar />
 
       <PlaybackControls
         isPlaying={isPlaying}
