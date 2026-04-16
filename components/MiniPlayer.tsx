@@ -1,15 +1,32 @@
-import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
+import { useRouter, usePathname } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/utils/colors';
 import { usePlayerStore } from '@/stores';
+import { play, pause } from '@/services/audioService';
 
 export function MiniPlayer() {
   const router = useRouter();
-  const { currentSong } = usePlayerStore();
+  const pathname = usePathname();
+  const { currentSong, isPlaying, setIsPlaying } = usePlayerStore();
 
-  if (!currentSong) {
+  const handleTogglePlay = useCallback(
+    async (e: { stopPropagation: () => void }) => {
+      e.stopPropagation();
+      if (isPlaying) {
+        await pause();
+        setIsPlaying(false);
+      } else {
+        await play();
+        setIsPlaying(true);
+      }
+    },
+    [isPlaying, setIsPlaying]
+  );
+
+  if (!currentSong || pathname === '/modal') {
     return null;
   }
 
@@ -26,6 +43,11 @@ export function MiniPlayer() {
           {currentSong.artist}
         </ThemedText>
       </View>
+      <Pressable style={styles.playButton} onPress={handleTogglePlay}>
+        <ThemedText style={styles.playIcon}>
+          {isPlaying ? '⏸' : '▶'}
+        </ThemedText>
+      </Pressable>
     </Pressable>
   );
 }
@@ -52,5 +74,15 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: 12,
     marginTop: 2,
+  },
+  playButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playIcon: {
+    fontSize: 20,
+    color: Colors.text,
   },
 });
