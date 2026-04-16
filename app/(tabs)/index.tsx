@@ -1,98 +1,137 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useCallback } from 'react';
+import { ActivityIndicator, AppState, StyleSheet, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { PermissionDeniedView } from '@/components/PermissionDeniedView';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Colors } from '@/utils/colors';
+import { usePlayerStore } from '@/stores';
+import {
+  requestMediaPermission,
+  getMediaPermission,
+  openSettings,
+} from '@/services/permissionService';
+import { fetchSongs } from '@/services/musicService';
 
-export default function HomeScreen() {
+export default function SongsScreen() {
+  const { permissionStatus, setPermissionStatus, songs, setSongs, isLoadingSongs, setLoadingSongs } =
+    usePlayerStore();
+
+  const loadSongs = useCallback(async () => {
+    setLoadingSongs(true);
+    try {
+      const fetchedSongs = await fetchSongs();
+      setSongs(fetchedSongs);
+    } catch (error) {
+      console.error('Failed to load songs:', error);
+    } finally {
+      setLoadingSongs(false);
+    }
+  }, [setSongs, setLoadingSongs]);
+
+  const checkAndRequestPermission = useCallback(async () => {
+    const current = await getMediaPermission();
+    setPermissionStatus(current);
+
+    if (current !== 'granted') {
+      const result = await requestMediaPermission();
+      setPermissionStatus(result);
+
+      if (result === 'granted') {
+        loadSongs();
+      }
+    } else {
+      loadSongs();
+    }
+  }, [loadSongs, setPermissionStatus]);
+
+  useEffect(() => {
+    checkAndRequestPermission();
+  }, [checkAndRequestPermission]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        getMediaPermission().then(setPermissionStatus);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [setPermissionStatus]);
+
+  const handleGrantAccess = () => {
+    checkAndRequestPermission();
+  };
+
+  const handleOpenSettings = () => {
+    openSettings();
+  };
+
+  if (permissionStatus !== 'granted') {
+    return (
+      <PermissionDeniedView
+        status={permissionStatus}
+        onGrantAccess={handleGrantAccess}
+        onOpenSettings={handleOpenSettings}
+      />
+    );
+  }
+
+  if (isLoadingSongs) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <ThemedText style={styles.loadingText}>Loading songs...</ThemedText>
+        </View>
+      </ThemedView>
+    );
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+    <ThemedView style={styles.container}>
+      <View style={styles.content}>
+        <ThemedText type="subtitle" style={styles.title}>
+          {songs.length} Songs
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+        <ThemedText style={styles.hint}>
+          {songs.length === 0
+            ? 'No songs found on your device'
+            : 'Tap a song to start playing'}
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  stepContainer: {
-    gap: 8,
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    color: Colors.text,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  hint: {
+    color: Colors.textSecondary,
+    textAlign: 'center',
+  },
+  loadingText: {
+    color: Colors.textSecondary,
+    marginTop: 12,
   },
 });
