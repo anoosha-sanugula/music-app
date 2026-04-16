@@ -24,7 +24,7 @@ export default function TabLayout() {
         },
       }}>
       <Tabs.Screen
-        name="SongListScreen"
+        name="index"
         options={{
           title: 'Songs',
           tabBarLabel: 'Songs',
