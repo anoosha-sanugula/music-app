@@ -8,10 +8,12 @@ import {
   TextInput,
   Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import type { AVPlaybackStatus } from 'expo-av';
 
 import { PermissionDeniedView } from '@/components/PermissionDeniedView';
 import { SongListItem } from '@/components/SongListItem';
+import { SongOptionsMenu } from '@/components/SongOptionsMenu';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/utils/colors';
@@ -57,6 +59,8 @@ export default function SongListScreen() {
   const [sortOption, setSortOption] = useState<SortOption>('az');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
   useEffect(() => {
     initializeAudio();
@@ -134,6 +138,16 @@ export default function SongListScreen() {
 
   const handleOpenSettings = () => {
     openSettings();
+  };
+
+  const handleOpenOptions = (song: Song) => {
+    setSelectedSong(song);
+    setShowOptionsMenu(true);
+  };
+
+  const handleCloseOptions = () => {
+    setShowOptionsMenu(false);
+    setSelectedSong(null);
   };
 
   const filteredAndSortedSongs = useMemo(() => {
@@ -240,6 +254,7 @@ export default function SongListScreen() {
             song={item}
             isPlaying={currentSong?.id === item.id && isPlaying}
             onPress={() => handlePlaySong(item, filteredAndSortedSongs)}
+            onLongPress={() => handleOpenOptions(item)}
           />
         )}
         refreshControl={
@@ -259,6 +274,13 @@ export default function SongListScreen() {
           </View>
         }
         contentContainerStyle={songs.length === 0 ? styles.emptyList : undefined}
+      />
+
+      <SongOptionsMenu
+        song={selectedSong}
+        visible={showOptionsMenu}
+        onClose={handleCloseOptions}
+        allSongs={filteredAndSortedSongs}
       />
     </ThemedView>
   );

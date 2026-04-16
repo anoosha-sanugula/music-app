@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useRouter, usePathname } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/utils/colors';
@@ -10,6 +11,7 @@ import { play, pause } from '@/services/audioService';
 export function MiniPlayer() {
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
   const { currentSong, isPlaying, setIsPlaying } = usePlayerStore();
 
   const handleTogglePlay = useCallback(
@@ -32,7 +34,10 @@ export function MiniPlayer() {
 
   return (
     <Pressable
-      style={styles.container}
+      style={[
+        styles.container,
+        { paddingBottom: insets.bottom > 0 ? 0 : 8 },
+      ]}
       onPress={() => router.push('/modal')}
     >
       <View style={styles.info}>
@@ -45,7 +50,7 @@ export function MiniPlayer() {
       </View>
       <Pressable style={styles.playButton} onPress={handleTogglePlay}>
         <ThemedText style={styles.playIcon}>
-          {isPlaying ? '⏸' : '▶'}
+          {isPlaying ? '\u23F8\uFE0F' : '\u25B6\uFE0F'}
         </ThemedText>
       </Pressable>
     </Pressable>
@@ -54,6 +59,10 @@ export function MiniPlayer() {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    bottom: 60,
+    left: 0,
+    right: 0,
     height: 56,
     backgroundColor: Colors.surface,
     borderTopWidth: 1,

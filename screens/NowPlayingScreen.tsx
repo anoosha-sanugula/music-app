@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { SeekBar } from '@/components/SeekBar';
 import { PlaybackControls } from '@/components/PlaybackControls';
+import { LikeButton } from '@/components/LikeButton';
 import { Colors } from '@/utils/colors';
 import { usePlayerStore } from '@/stores';
 import { play, pause } from '@/services/audioService';
@@ -20,6 +21,8 @@ export default function NowPlayingScreen() {
     setIsPlaying,
     playNext,
     playPrevious,
+    repeatMode,
+    cycleRepeatMode,
   } = usePlayerStore();
 
   const handleTogglePlay = useCallback(async () => {
@@ -31,6 +34,17 @@ export default function NowPlayingScreen() {
       setIsPlaying(true);
     }
   }, [isPlaying, setIsPlaying]);
+
+  const getRepeatIcon = () => {
+    switch (repeatMode) {
+      case 'one':
+        return '\uD83C\uDD82\uFE0F';
+      case 'all':
+        return '\uD83D\uDD01';
+      default:
+        return '\uD83D\uDD01';
+    }
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -50,6 +64,13 @@ export default function NowPlayingScreen() {
       </View>
 
       <SeekBar position={position} duration={duration} />
+
+      <View style={styles.actions}>
+        {currentSong && <LikeButton songId={currentSong.id} size={32} />}
+        <Pressable onPress={cycleRepeatMode} style={styles.repeatButton}>
+          <ThemedText style={styles.repeatIcon}>{getRepeatIcon()}</ThemedText>
+        </Pressable>
+      </View>
 
       <PlaybackControls
         isPlaying={isPlaying}
@@ -103,6 +124,19 @@ const styles = StyleSheet.create({
   artist: {
     color: Colors.textSecondary,
     fontSize: 16,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 32,
+  },
+  repeatButton: {
+    padding: 8,
+  },
+  repeatIcon: {
+    fontSize: 32,
   },
   queueInfo: {
     alignItems: 'center',

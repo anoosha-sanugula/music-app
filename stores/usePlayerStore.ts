@@ -3,6 +3,9 @@ import { Audio } from 'expo-av';
 import type { Song } from '@/types/Song';
 import type { PermissionStatus } from '@/services/permissionService';
 
+let lastTrackChange = 0;
+const DEBOUNCE_MS = 300;
+
 interface PlayerState {
   permissionStatus: PermissionStatus;
   songs: Song[];
@@ -63,6 +66,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }),
   toggleShuffle: () => set((state) => ({ isShuffled: !state.isShuffled })),
   playNext: () => {
+    const now = Date.now();
+    if (now - lastTrackChange < DEBOUNCE_MS) return;
+    lastTrackChange = now;
+
     const { queue, queueIndex, repeatMode } = get();
     if (queue.length === 0) return;
 
@@ -75,6 +82,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
   playPrevious: () => {
+    const now = Date.now();
+    if (now - lastTrackChange < DEBOUNCE_MS) return;
+    lastTrackChange = now;
+
     const { queue, queueIndex } = get();
     if (queue.length === 0) return;
 

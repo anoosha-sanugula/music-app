@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, FlatList, Pressable, Alert, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
@@ -16,7 +15,7 @@ type AlbumItem = {
   songs: Song[];
 };
 
-export default function LibraryScreen() {
+export default function AlbumsScreen() {
   const router = useRouter();
   const {
     likedSongIds,
@@ -129,11 +128,11 @@ export default function LibraryScreen() {
 
   if (isLoading || !isLoaded) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.container}>
         <View style={styles.centered}>
           <ThemedText>Loading library...</ThemedText>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -143,7 +142,7 @@ export default function LibraryScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <ThemedText type="title">Library</ThemedText>
         <Pressable style={styles.addButton} onPress={handleCreateAlbum}>
@@ -234,7 +233,7 @@ export default function LibraryScreen() {
           </Pressable>
         </Modal>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

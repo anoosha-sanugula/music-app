@@ -13,7 +13,14 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to find music files.",
         "NSAppleMusicUsageDescription": "This app needs access to Apple Music to play your songs.",
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": ["audio"],
+        "CFBundleDocumentTypes": [
+          {
+            "CFBundleTypeName": "Audio",
+            "LSItemContentTypes": ["public.audio", "public.mp3", "public.mpeg-4-audio", "com.apple.m4a-audio"],
+            "LSHandlerRank": "Alternate"
+          }
+        ]
       },
       "bundleIdentifier": "com.anonymous.musicapp"
     },
@@ -31,7 +38,24 @@
         "READ_EXTERNAL_STORAGE",
         "READ_MEDIA_AUDIO"
       ],
-      "package": "com.anonymous.musicapp"
+      "package": "com.anonymous.musicapp",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "file",
+              "mimeType": "audio/*"
+            },
+            {
+              "scheme": "content",
+              "mimeType": "audio/*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "output": "static",

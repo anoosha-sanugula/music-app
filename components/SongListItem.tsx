@@ -1,17 +1,24 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import type { Song } from '@/types/Song';
 import { ThemedText } from '@/components/themed-text';
+import { LikeButton } from '@/components/LikeButton';
 import { Colors } from '@/utils/colors';
 
 interface Props {
   song: Song;
   isPlaying: boolean;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
-export function SongListItem({ song, isPlaying, onPress }: Props) {
+export function SongListItem({ song, isPlaying, onPress, onLongPress }: Props) {
   return (
-    <Pressable style={styles.container} onPress={onPress}>
+    <Pressable
+      style={styles.container}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={300}
+    >
       <View style={styles.info}>
         <ThemedText
           style={[styles.title, isPlaying && styles.active]}
@@ -23,6 +30,7 @@ export function SongListItem({ song, isPlaying, onPress }: Props) {
           {song.artist}
         </ThemedText>
       </View>
+      <LikeButton songId={song.id} />
       <ThemedText style={styles.duration}>
         {formatDuration(song.duration)}
       </ThemedText>
