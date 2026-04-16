@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { ActivityIndicator, AppState, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { PermissionDeniedView } from '@/components/PermissionDeniedView';
 import { ThemedText } from '@/components/themed-text';
@@ -10,6 +10,7 @@ import {
   requestMediaPermission,
   getMediaPermission,
   openSettings,
+  createPermissionListener,
 } from '@/services/permissionService';
 import { fetchSongs } from '@/services/musicService';
 
@@ -50,15 +51,8 @@ export default function SongsScreen() {
   }, [checkAndRequestPermission]);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active') {
-        getMediaPermission().then(setPermissionStatus);
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
+    const removeListener = createPermissionListener(setPermissionStatus);
+    return removeListener;
   }, [setPermissionStatus]);
 
   const handleGrantAccess = () => {

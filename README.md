@@ -1,50 +1,75 @@
-# Welcome to your Expo app 👋
+# Music App 🎵
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform music player app built with Expo, supporting both iOS and Android.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Browse and play music from device library
+- Permission handling with AppState re-check
+- Dark theme UI
+- Mini player with playback controls
+- Liked songs and albums (Phase 4)
 
+## Tech Stack
+
+- **Framework**: Expo SDK 54 (React Native 0.81)
+- **Routing**: expo-router (file-based routing)
+- **State**: Zustand
+- **Audio**: expo-av
+- **Media Library**: expo-media-library
+- **Persistence**: expo-file-system
+
+## Project Structure
+
+```
+├── app/                    # Expo Router screens
+│   ├── (tabs)/            # Tab screens
+│   │   ├── index.tsx      # Songs tab
+│   │   └── library.tsx    # Library tab
+│   ├── modal.tsx          # Now Playing modal
+│   └── _layout.tsx        # Root layout
+├── components/             # Reusable UI components
+├── hooks/                 # Custom React hooks
+├── services/              # Business logic
+│   ├── permissionService.ts
+│   └── musicService.ts
+├── stores/                # Zustand stores
+├── types/                 # TypeScript types
+└── utils/                 # Design system (colors, typography, spacing)
+```
+
+## Development
+
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+2. Start the dev server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Run on iOS:
+   ```bash
+   npx expo run:ios
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+4. Run on Android:
+   ```bash
+   npx expo run:android
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Phases
 
-## Get a fresh project
+- **Phase 1**: Foundation & Project Setup ✅
+- **Phase 2**: Device Access & Music Discovery ✅
+- **Phase 3**: Core Playback Experience (in progress)
+- **Phase 4**: Personalization & Advanced Features
 
-When you're ready, run:
+## Commands
 
 ```bash
-npm run reset-project
+npm run lint        # Run ESLint
+npm run reset-project  # Reset to blank template
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

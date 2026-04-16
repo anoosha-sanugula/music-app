@@ -1,5 +1,6 @@
 import * as MediaLibrary from 'expo-media-library';
 import * as Linking from 'expo-linking';
+import { AppState, type AppStateStatus } from 'react-native';
 
 export type PermissionStatus = 'granted' | 'denied' | 'blocked' | 'undetermined';
 
@@ -22,4 +23,20 @@ export async function getMediaPermission(): Promise<PermissionStatus> {
 
 export async function openSettings(): Promise<void> {
   await Linking.openSettings();
+}
+
+export function createPermissionListener(
+  onStatusChange: (status: PermissionStatus) => void
+): () => void {
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === 'active') {
+      getMediaPermission().then(onStatusChange);
+    }
+  };
+
+  const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+  return () => {
+    subscription.remove();
+  };
 }
